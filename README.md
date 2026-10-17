@@ -2,6 +2,8 @@
 
 A GPS tripmeter app for rally co-drivers, built as a React + Vite web app packaged with Capacitor for Android. Designed to be read at a glance while driving: big numbers, simple gestures, no scrolling.
 
+It is styled as a precision field instrument rather than a sports brand — the number is the interface, and colour is reserved for state. The strategy behind that lives in [PRODUCT.md](PRODUCT.md), the visual system in [DESIGN.md](DESIGN.md).
+
 ## Current features
 
 ### Trip screen
@@ -12,19 +14,24 @@ The main screen, fixed to the viewport (no scrolling), with three elements:
   - **Tap** anywhere in that area → resets "od poslední zatáčky".
   - **Hold for 1s+** → resets "od startu" (and, with it, "od poslední zatáčky").
 - **Current speed** — read-only, GPS-derived, shown smaller below the main area.
-- **Pause/Resume** button next to the speed — freezes distance accumulation without losing GPS lock.
+- **Pause/Resume** button next to the speed — freezes distance accumulation without losing GPS lock. While paused, a diagonal caution band appears on the data frame and a flag shows in the status strip, so the state is never carried by colour alone.
 - **Manual correction buttons** (`-step` / `± custom` / `+step`):
   - Short press corrects only "od poslední zatáčky".
   - Hold 1s+ corrects everything at once (total/trip A/trip B/partial) — meant for calibrating before the start.
-- Layout adapts to landscape orientation (values go side-by-side, font sizes scale with viewport height instead of width) so it stays usable with the phone rotated.
+- Hold gestures draw a progress rule along the bottom edge of the zone being held, so a long press is never a guess.
+- Layout adapts to landscape orientation (values go side-by-side) and the numerals size themselves from the field they sit in, so they fill the frame on any screen without media queries.
 
 ### RZ screen (special stage stopwatch)
 
-Start/stop/split/reset stopwatch for timing a stage, independent of the trip odometer, with running distance, average speed, and max speed for the stage, plus a split list.
+Start/stop/split stopwatch for timing a stage, independent of the trip odometer, with running distance, average speed, and max speed for the stage. Splits are listed as a ruled time card. Clearing the stage requires a deliberate hold, so a stage time can't be wiped by a stray gloved touch.
 
 ### Settings screen
 
-Units (metric/imperial), theme (dark/light), big-buttons toggle, keep-awake toggle, haptics toggle, speed limit (for recce/transit warnings), manual-correction step size, and decimal places for the main odometer.
+Grouped into measurement, display, and in-car panels:
+
+- **Measurement** — GPS distance calibration coefficient, accuracy limit (which fixes count), manual-correction step size, decimal places for the main readout.
+- **Display** — units (metric/imperial), mode (Cockpit / Daylight), bigger touch targets for gloved hands.
+- **In-car** — keep screen awake, haptics, speed limit warning (0 disables it, for recce runs).
 
 ## GPS handling
 
@@ -40,7 +47,9 @@ Units (metric/imperial), theme (dark/light), big-buttons toggle, keep-awake togg
 
 - [React](https://react.dev/) 18 + [Vite](https://vitejs.dev/) 6
 - [Capacitor](https://capacitorjs.com/) 6 for the native Android shell (`@capacitor/geolocation`, `@capacitor/splash-screen`)
-- Plain CSS (no framework) — dark theme by default, design tokens in `src/styles.css`
+- Plain CSS, no framework — OKLCH design tokens in `src/styles.css`, container queries for the readouts
+- [Archivo](https://fonts.google.com/specimen/Archivo) as a self-hosted variable font (`src/fonts/`), weight and width axes, latin + latin-ext for Czech diacritics. Self-hosted rather than CDN-linked because the app has to work with no signal at all.
+- `vite-plugin-mkcert` for local HTTPS in development (see below)
 - `localStorage`-backed persistence for trip counters and settings (`src/lib/storage.js`)
 
 ## Getting started
@@ -72,21 +81,25 @@ Note: `android/` and `ios/` are git-ignored and regenerated with `npx cap add an
 ## Project structure
 
 ```
+PRODUCT.md             who it's for, what it's for, design principles
+DESIGN.md              visual system: tokens, typography, form language, motion
 src/
-  App.jsx              tab shell, status bar, wake-lock handling
+  App.jsx              tab shell, GPS status strip, wake-lock handling
   main.jsx             provider setup (Settings, Trip, Notes) + root render
-  styles.css            design tokens and all component/screen styles
+  styles.css           design tokens and all component/screen styles
+  fonts/               self-hosted Archivo variable font (latin, latin-ext)
   lib/
-    trip.jsx            GPS watch, distance/speed state, stage stopwatch, trip actions
-    settings.jsx         user settings state + persistence
-    notes.jsx             stage-notes data model (not currently wired into a screen)
-    geo.js                 formatting + geodesic helpers (haversine, unit conversion, clock format)
-    storage.js              localStorage read/write helpers
-  components/ui.jsx     shared UI primitives (Sheet, Seg, Row, Toggle, NumberSheet, HoldButton, PressArea)
+    trip.jsx           GPS watch, distance/speed state, stage stopwatch, trip actions
+    settings.jsx       user settings state + persistence + theme application
+    notes.jsx          stage-notes data model (not currently wired into a screen)
+    geo.js             formatting + geodesic helpers (haversine, units, clock format)
+    storage.js         localStorage read/write helpers
+  components/ui.jsx    UI primitives (Sheet, Seg, Setting, Toggle, NumberSheet,
+                       HoldButton, PressArea) sharing one press-gesture hook
   screens/
-    TripScreen.jsx       main odometer screen
-    StageScreen.jsx        RZ stopwatch
-    SettingsScreen.jsx       settings form
+    TripScreen.jsx     main odometer screen
+    StageScreen.jsx    RZ stopwatch
+    SettingsScreen.jsx settings panels
 ```
 
 ## Status

@@ -1,44 +1,41 @@
 import { useEffect, useState } from 'react';
 import { useSettings } from './lib/settings.jsx';
 import { useTrip } from './lib/trip.jsx';
-import { toSpeed, speedUnit } from './lib/geo.js';
 import TripScreen from './screens/TripScreen.jsx';
 import StageScreen from './screens/StageScreen.jsx';
 import SettingsScreen from './screens/SettingsScreen.jsx';
 
 const TABS = [
-  { id: 'trip', label: 'Trip', ico: '⟲', Screen: TripScreen },
-  { id: 'stage', label: 'RZ', ico: '⏱', Screen: StageScreen },
-  { id: 'set', label: 'Nastaveni', ico: '⚙', Screen: SettingsScreen },
+  { id: 'trip', label: 'Trip', Screen: TripScreen },
+  { id: 'stage', label: 'RZ', Screen: StageScreen },
+  { id: 'set', label: 'Nastavení', Screen: SettingsScreen },
 ];
 
-const STATUS_TEXT = {
-  idle: ['', 'Start...'],
-  waiting: ['pulse', 'Hledam satelity'],
+// Stav GPS se hlasi slovem i barvou - samotna barva by vypadla pro
+// barvosleheho uzivatele.
+const GPS_STATE = {
+  idle: [null, 'Čekání'],
+  waiting: ['pulse', 'Hledání družic'],
   ok: ['ok', 'GPS'],
-  weak: ['weak', 'Slaby signal'],
+  weak: ['weak', 'Slabý signál'],
   stale: ['bad', 'Ztracen fix'],
-  denied: ['bad', 'Poloha zakazana'],
+  denied: ['bad', 'Poloha zakázána'],
   error: ['bad', 'Chyba GPS'],
 };
 
-function StatusBar() {
-  const { settings } = useSettings();
+function Strip() {
   const trip = useTrip();
-  const [cls, text] = STATUS_TEXT[trip.status] || STATUS_TEXT.idle;
-  const kmh = toSpeed(trip.speed, settings.units);
-  const over = settings.speedLimit > 0 && kmh > settings.speedLimit + 1;
+  const [state, label] = GPS_STATE[trip.status] || GPS_STATE.idle;
 
   return (
-    <div className="status">
-      <span className={`dot ${cls}`} />
-      <span>{text}</span>
-      {trip.accuracy != null && <span className="num">±{Math.round(trip.accuracy)} m</span>}
-      <span className="grow" />
-      {trip.frozen && <span className="freeze-flag">PAUZA</span>}
-      <span className={`num ${over ? 'bad' : ''}`}>
-        <b>{kmh.toFixed(0)}</b> {speedUnit(settings.units)}
-      </span>
+    <div className="strip">
+      <span className="strip-lamp" data-state={state || undefined} />
+      <span>{label}</span>
+      <span className="strip-spacer" />
+      {trip.accuracy != null && (
+        <span className="strip-meta tnum">±{Math.round(trip.accuracy)} m</span>
+      )}
+      {trip.frozen && <span className="strip-flag">Pauza</span>}
     </div>
   );
 }
@@ -75,18 +72,17 @@ export default function App() {
 
   return (
     <div className="app">
-      <StatusBar />
+      <Strip />
       <div className="main">
         <Screen go={setTab} />
       </div>
-      <nav className="tabs">
+      <nav className="nav">
         {TABS.map((t) => (
           <button
             key={t.id}
             aria-current={tab === t.id ? 'page' : undefined}
             onClick={() => setTab(t.id)}
           >
-            <span className="ico">{t.ico}</span>
             {t.label}
           </button>
         ))}

@@ -1,74 +1,159 @@
 /* ------------------------------------------------------------------ *
  * RallyTrip - design system
- * Cteni za jizdy: vysoky kontrast, velke cislice, palcove ovladaci plochy.
+ *
+ * Precision field instrument, not a sports brand. The number is the
+ * interface; colour is state, never decoration. See DESIGN.md.
  * ------------------------------------------------------------------ */
 
+/* --- font: Archivo variable, self-hosted (must work with no signal) -- */
+
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 62.5% 125%;
+  font-display: swap;
+  src: url('./fonts/archivo-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 62.5% 125%;
+  font-display: swap;
+  src: url('./fonts/archivo-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+/* --- tokens: cockpit (dark) ----------------------------------------- */
+
 :root {
-  --bg: #0b0d10;
-  --bg-2: #14181d;
-  --bg-3: #1c2127;
-  --line: #2a3139;
-  --fg: #f2f4f6;
-  --fg-dim: #97a1ac;
-  --fg-faint: #5d6974;
-  --accent: #ff5c00;
-  --accent-soft: rgba(255, 92, 0, 0.14);
-  --ok: #2fd15b;
-  --warn: #ffc400;
-  --bad: #ff3b30;
-  --radius: 14px;
-  --tap: 56px;
+  --bg: oklch(0.14 0.008 250);
+  --surface: oklch(0.185 0.01 250);
+  --surface-2: oklch(0.245 0.012 250);
+  --surface-3: oklch(0.3 0.013 250);
+  --line: oklch(0.33 0.014 250);
+  --line-strong: oklch(0.44 0.016 250);
+
+  --ink: oklch(0.97 0.002 250);
+  --ink-dim: oklch(0.76 0.01 250);
+  --ink-faint: oklch(0.62 0.012 250);
+
+  --signal: oklch(0.86 0.17 118);
+  --signal-soft: oklch(0.86 0.17 118 / 0.14);
+  --caution: oklch(0.82 0.16 85);
+  --caution-soft: oklch(0.82 0.16 85 / 0.14);
+  --alert: oklch(0.68 0.2 27);
+  --alert-soft: oklch(0.68 0.2 27 / 0.14);
+  --on-signal: oklch(0.16 0.01 250);
+
+  --radius: 3px;
+  --tap: 60px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --fast: 160ms;
+  --mid: 220ms;
+
+  --z-strip: 10;
+  --z-nav: 20;
+  --z-backdrop: 40;
+  --z-sheet: 50;
 
   color-scheme: dark;
 }
 
+/* Rukavice: vetsi dotykove plochy, zapina se v nastaveni. */
+:root[data-big='true'] {
+  --tap: 68px;
+}
+
+/* --- tokens: daylight ------------------------------------------------ */
+
 :root[data-theme='light'] {
-  --bg: #eceef1;
-  --bg-2: #ffffff;
-  --bg-3: #e2e5ea;
-  --line: #c7ccd3;
-  --fg: #0d1116;
-  --fg-dim: #4c5663;
-  --fg-faint: #828d9a;
-  --accent: #e04a00;
-  --accent-soft: rgba(224, 74, 0, 0.12);
-  --ok: #157f36;
-  --warn: #a97800;
-  --bad: #c92a21;
+  --bg: oklch(0.95 0.004 250);
+  --surface: oklch(0.995 0.002 250);
+  --surface-2: oklch(0.925 0.006 250);
+  --surface-3: oklch(0.87 0.008 250);
+  --line: oklch(0.84 0.01 250);
+  --line-strong: oklch(0.7 0.012 250);
+
+  --ink: oklch(0.17 0.01 250);
+  --ink-dim: oklch(0.42 0.012 250);
+  --ink-faint: oklch(0.5 0.012 250);
+
+  --signal: oklch(0.45 0.14 118);
+  --signal-soft: oklch(0.45 0.14 118 / 0.12);
+  --caution: oklch(0.5 0.13 70);
+  --caution-soft: oklch(0.5 0.13 70 / 0.12);
+  --alert: oklch(0.5 0.2 27);
+  --alert-soft: oklch(0.5 0.2 27 / 0.1);
+  --on-signal: oklch(0.99 0.002 250);
 
   color-scheme: light;
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+/* --- base ------------------------------------------------------------ */
 
-html, body, #root { height: 100%; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
 
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--fg);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
-  font-size: 15px;
+  color: var(--ink);
+  font-family: 'Archivo', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 450;
   line-height: 1.35;
   overscroll-behavior: none;
   user-select: none;
+  -webkit-font-smoothing: antialiased;
 }
 
-input, textarea { user-select: text; }
+input,
+textarea {
+  user-select: text;
+}
 
-.num {
+:where(button, [role='button'], input, select):focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+/* Every number in the app holds its digit positions while counting. */
+.tnum,
+.field-value,
+.readout-value,
+.stage-clock,
+.metric-value,
+.split-row {
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1;
-  letter-spacing: -0.02em;
 }
 
-/* --- shell --------------------------------------------------------- */
+/* --- shell ----------------------------------------------------------- */
 
 .app {
   display: flex;
   flex-direction: column;
   height: 100%;
   padding-top: env(safe-area-inset-top, 0px);
+  background: var(--bg);
 }
 
 .main {
@@ -76,458 +161,833 @@ input, textarea { user-select: text; }
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 10px 12px 16px;
+  padding: 12px;
 }
 
-/* --- status bar ---------------------------------------------------- */
+/* --- instrument strip (GPS health) ----------------------------------- */
 
-.status {
+.strip {
+  position: relative;
+  z-index: var(--z-strip);
+  flex: none;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 7px 12px;
-  background: var(--bg-2);
+  padding: 8px 12px;
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
-  font-size: 12px;
-  color: var(--fg-dim);
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
   white-space: nowrap;
 }
 
-.status .dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--fg-faint);
+/* A block, not a dot: reads as a status lamp on a panel. */
+.strip-lamp {
   flex: none;
+  width: 10px;
+  height: 10px;
+  background: var(--ink-faint);
+  border-radius: 1px;
 }
-.dot.ok { background: var(--ok); }
-.dot.weak { background: var(--warn); }
-.dot.bad { background: var(--bad); }
-.dot.pulse { animation: pulse 1.2s ease-in-out infinite; }
 
-@keyframes pulse { 50% { opacity: 0.25; } }
+.strip-lamp[data-state='ok'] {
+  background: var(--signal);
+}
+.strip-lamp[data-state='weak'] {
+  background: var(--caution);
+}
+.strip-lamp[data-state='bad'] {
+  background: var(--alert);
+}
+.strip-lamp[data-state='pulse'] {
+  background: var(--caution);
+  animation: lamp 1.3s steps(2, jump-none) infinite;
+}
 
-.status .grow { flex: 1; }
-.status b { color: var(--fg); font-weight: 600; }
+@keyframes lamp {
+  50% {
+    opacity: 0.2;
+  }
+}
 
-.freeze-flag {
-  color: var(--bg);
-  background: var(--warn);
-  border-radius: 6px;
-  padding: 1px 7px;
-  font-weight: 700;
+.strip-spacer {
+  flex: 1;
+}
+
+.strip-meta {
+  font-weight: 550;
   letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--ink-faint);
 }
 
-/* --- tabs ---------------------------------------------------------- */
+.strip-flag {
+  padding: 2px 7px;
+  background: var(--caution);
+  color: var(--on-signal);
+  border-radius: 1px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
 
-.tabs {
+/* --- tab nav --------------------------------------------------------- */
+
+.nav {
+  position: relative;
+  z-index: var(--z-nav);
+  flex: none;
   display: flex;
-  background: var(--bg-2);
+  background: var(--surface);
   border-top: 1px solid var(--line);
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  flex: none;
 }
 
-.tabs button {
+.nav button {
   flex: 1;
-  min-height: 54px;
-  background: none;
-  border: 0;
-  color: var(--fg-faint);
-  font: inherit;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  min-height: 56px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 6px 2px;
-  cursor: pointer;
-}
-
-.tabs button .ico { font-size: 18px; line-height: 1; }
-.tabs button[aria-current='page'] { color: var(--accent); }
-
-/* --- cards --------------------------------------------------------- */
-
-.card {
-  background: var(--bg-2);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 12px;
-  margin-bottom: 10px;
-}
-
-.card.flat { background: none; border-color: transparent; padding: 0; }
-
-.label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  gap: 4px;
+  padding: 8px 2px;
+  background: none;
+  border: 0;
+  border-top: 2px solid transparent;
+  margin-top: -1px;
+  color: var(--ink-faint);
+  font: inherit;
+  font-size: 0.6875rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--fg-faint);
-}
-
-.row { display: flex; gap: 8px; align-items: center; }
-.row.wrap { flex-wrap: wrap; }
-.row .grow { flex: 1; min-width: 0; }
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-
-/* --- odometr ------------------------------------------------------- */
-
-.odo-main {
-  text-align: center;
-  padding: 6px 0 2px;
-}
-
-.odo-main .value {
-  font-size: clamp(60px, 22vw, 108px);
-  font-weight: 800;
-  line-height: 0.95;
-  color: var(--accent);
-}
-
-.odo-main .unit {
-  font-size: 0.32em;
-  font-weight: 700;
-  color: var(--fg-dim);
-  margin-left: 0.15em;
-  letter-spacing: 0.04em;
-}
-
-.odo-sub .value {
-  font-size: clamp(26px, 9vw, 40px);
-  font-weight: 700;
-  line-height: 1.05;
-}
-
-.odo-sub .unit { font-size: 0.4em; color: var(--fg-dim); margin-left: 0.2em; font-weight: 600; }
-
-.gap-big .value {
-  font-size: clamp(72px, 28vw, 150px);
-  font-weight: 800;
-  line-height: 0.9;
-  color: var(--fg);
-}
-
-/* --- trip (fixni, bez scrollu) -------------------------------------- */
-
-.trip-screen {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  gap: 12px;
-}
-
-.trip-main {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  background: var(--bg-2);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
   cursor: pointer;
-  overflow: hidden;
-  transition: background 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: color var(--fast) var(--ease);
 }
 
-.trip-main:active { background: var(--bg-3); }
+.nav button[aria-current='page'] {
+  color: var(--ink);
+  border-top-color: var(--signal);
+}
 
-.trip-num {
-  flex: 1;
-  min-height: 0;
+/* --- data field (the core readout) ----------------------------------- */
+
+.field {
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   text-align: center;
-  padding: 20px 12px;
+  padding: 16px 12px;
 }
 
-.trip-num + .trip-num { border-top: 1px solid var(--line); }
-
-.trip-num.start {
-  background: var(--accent-soft);
+.field-label {
+  font-size: 0.6875rem;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
 }
 
-.trip-num .label {
-  font-size: 13px;
-  letter-spacing: 0.14em;
-}
-
-.trip-num .value {
-  font-size: clamp(58px, 20vw, 108px);
+.field-value {
+  display: block;
+  margin-top: 6px;
   font-weight: 800;
-  line-height: 0.92;
-  color: var(--fg);
+  font-stretch: 112%;
+  letter-spacing: -0.03em;
+  line-height: 0.88;
+  color: var(--ink);
 }
 
-.trip-num.start .value { color: var(--accent); }
-
-.trip-num .unit {
-  font-size: 0.3em;
+/*
+ * Jednotka je popisek, ne soucast cisla: drzi se v uzkem rozsahu, aby
+ * u velkych cislic nekonkurovala hodnote.
+ */
+.field-unit {
+  margin-left: 0.5ch;
+  font-size: clamp(0.8125rem, 0.22em, 1.375rem);
   font-weight: 700;
-  color: var(--fg-dim);
-  margin-left: 0.16em;
+  font-stretch: 100%;
   letter-spacing: 0.04em;
+  color: var(--ink-dim);
 }
 
-.reset-hint {
-  display: inline-block;
+/* Instruction, not a control: must not look tappable. */
+.field-note {
   margin-top: 10px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: var(--bg-3);
+  font-size: 0.75rem;
+  font-weight: 550;
+  letter-spacing: 0.02em;
+  color: var(--ink-faint);
+}
+
+.field-note b {
+  font-weight: 700;
+  color: var(--ink-dim);
+}
+
+/* --- trip screen ----------------------------------------------------- */
+
+.trip {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.trip-frame {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
   border: 1px solid var(--line);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--fg-dim);
+  border-radius: var(--radius);
+  cursor: pointer;
+  overflow: hidden;
+  transition: background var(--fast) var(--ease);
 }
 
-.trip-num.start .reset-hint {
-  background: rgba(255, 92, 0, 0.1);
-  border-color: rgba(255, 92, 0, 0.35);
-  color: var(--accent);
+.trip-frame:active {
+  background: var(--surface-2);
 }
 
-.trip-speed-row {
+.trip-frame .field {
+  flex: 1;
+  min-height: 0;
+  /* Pole je kontejner, aby cislice mohly vychazet z jeho skutecne vysky. */
+  container-type: size;
+}
+
+.trip-frame .field + .field {
+  border-top: 1px solid var(--line);
+}
+
+/*
+ * Cislice plni pole: sirka se pocita z delky retezce (--chars nastavuje
+ * komponenta), vyska je strop. Dlouhe cislo se tak zmensi misto pretekani
+ * a kratke vyplni vysku - bez media queries a na libovolnem telefonu.
+ */
+.trip-frame .field-value {
+  /* max() je pojistka: pri zkolabovane vysce pole by cislo vyslo nulove
+     a zmizelo by - radeji pretece, nez aby udaj nebyl videt. */
+  font-size: calc(max(1.75rem, min(142cqw / var(--chars, 4), 66cqh)) * var(--vscale, 1));
+}
+
+/* Druhy udaj je drzen niz, aby oko dopadlo nejdriv na hlavni. */
+.trip-frame .field:not(.field--primary) {
+  --vscale: 0.82;
+}
+
+/* Paused: hazard band. An authentic motorsport signal that also informs. */
+.trip-frame.is-paused {
+  border-color: var(--caution);
+}
+
+.trip-frame.is-paused::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: repeating-linear-gradient(
+    115deg,
+    var(--caution) 0 10px,
+    transparent 10px 20px
+  );
+  background-size: 28.3px 4px;
+  animation: hazard 900ms linear infinite;
+}
+
+@keyframes hazard {
+  to {
+    background-position: 28.3px 0;
+  }
+}
+
+/* Hold-to-reset progress, drawn as a rule along the bottom edge. */
+.press-fill {
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background: var(--signal);
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+.trip-aux {
   flex: none;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
+  align-items: stretch;
+  gap: 10px;
 }
 
-.trip-speed { color: var(--fg-dim); }
-.trip-speed .num { font-size: 30px; font-weight: 700; color: var(--fg); }
-.trip-speed .unit { font-size: 13px; margin-left: 5px; }
+.readout-speed {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
 
-.trip-correct {
+.readout-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  font-stretch: 105%;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.readout-unit {
+  font-size: 0.6875rem;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.trip-controls {
   flex: none;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 8px;
 }
 
-/* na sirku je vyska omezena - udaje vedle sebe, mensi pisma z vh */
-@media (orientation: landscape) {
-  .trip-screen { gap: 8px; }
+/* --- buttons --------------------------------------------------------- */
 
-  .trip-main { flex-direction: row; }
-
-  .trip-num {
-    flex: 1;
-    min-width: 0;
-    padding: 8px 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .trip-num + .trip-num { border-top: 0; border-left: 1px solid var(--line); }
-
-  .trip-num.start { background: linear-gradient(90deg, var(--accent-soft) 0%, transparent 85%); }
-
-  .trip-num .label { font-size: 11px; }
-
-  .trip-num .value { font-size: clamp(34px, 13vh, 72px); line-height: 0.95; }
-
-  .reset-hint { margin-top: 6px; padding: 4px 10px; font-size: 11px; }
-
-  .trip-speed-row { gap: 10px; }
-  .trip-speed .num { font-size: 22px; }
-  .trip-speed .unit { font-size: 11px; }
-  .trip-speed-row .btn.sm { min-height: 36px; padding: 4px 10px; font-size: 12px; }
-
-  .trip-correct .btn { min-height: 40px; font-size: 13px; }
-}
-
-.muted { color: var(--fg-dim); }
-.faint { color: var(--fg-faint); }
-.accent { color: var(--accent); }
-.good { color: var(--ok); }
-.bad { color: var(--bad); }
-.warn { color: var(--warn); }
-.center { text-align: center; }
-.right { text-align: right; }
-.mono { font-variant-numeric: tabular-nums; }
-.small { font-size: 12px; }
-.nowrap { white-space: nowrap; }
-
-/* --- buttons ------------------------------------------------------- */
-
-button.btn {
+.btn {
+  position: relative;
   min-height: var(--tap);
-  border-radius: var(--radius);
-  border: 1px solid var(--line);
-  background: var(--bg-3);
-  color: var(--fg);
-  font: inherit;
-  font-size: 15px;
-  font-weight: 700;
-  padding: 10px 12px;
-  cursor: pointer;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  transition: transform 0.06s ease, background 0.12s ease;
-}
-
-button.btn:active { transform: scale(0.97); }
-button.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-button.btn.ghost { background: transparent; }
-button.btn.warn { background: var(--warn); border-color: var(--warn); color: #1a1200; }
-button.btn.danger { background: transparent; border-color: var(--bad); color: var(--bad); }
-button.btn.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
-button.btn.sm { min-height: 40px; font-size: 13px; padding: 6px 10px; border-radius: 10px; }
-button.btn.xl { min-height: 92px; font-size: 20px; }
-button.btn:disabled { opacity: 0.4; cursor: default; }
-button.btn.wide { width: 100%; }
-
-/* --- forms --------------------------------------------------------- */
-
-input[type='text'],
-input[type='number'],
-textarea,
-select {
-  width: 100%;
-  min-height: 46px;
-  background: var(--bg-3);
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--surface-2);
   border: 1px solid var(--line);
-  border-radius: 10px;
-  color: var(--fg);
+  border-radius: var(--radius);
+  color: var(--ink);
   font: inherit;
-  font-size: 16px; /* pod 16px iOS zoomuje pri fokusu */
-  padding: 8px 12px;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background var(--fast) var(--ease), border-color var(--fast) var(--ease),
+    color var(--fast) var(--ease);
 }
 
-input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.btn:hover:not(:disabled) {
+  background: var(--surface-3);
+}
 
-textarea { min-height: 70px; resize: vertical; }
+.btn:active:not(:disabled) {
+  background: var(--surface-3);
+  border-color: var(--line-strong);
+}
 
-.field { margin-bottom: 12px; }
-.field > .label { display: block; margin-bottom: 5px; }
+.btn:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
 
-.switch {
+.btn-sub {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/*
+ * Primarni akce je obrysova, ne vyplnena: signalni barva nesmi zabrat
+ * velkou plochu a konkurovat udaji, ktery je na obrazovce hlavni.
+ */
+.btn--primary {
+  background: var(--signal-soft);
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+.btn--primary:hover:not(:disabled),
+.btn--primary:active:not(:disabled) {
+  background: color-mix(in oklch, var(--signal) 24%, transparent);
+}
+
+.btn--caution {
+  background: var(--caution-soft);
+  border-color: var(--caution);
+  color: var(--caution);
+}
+
+/* Destruktivni akce v klidu nesvíti: nese ji text, ne cerveny blok. */
+.btn--alert {
+  background: transparent;
+  color: var(--alert);
+}
+
+.btn--alert:hover:not(:disabled),
+.btn--alert:active:not(:disabled) {
+  background: var(--alert-soft);
+  border-color: var(--alert);
+}
+
+.btn--alert .btn-sub {
+  color: color-mix(in oklch, var(--alert) 72%, var(--ink-faint));
+}
+
+.btn--alert .press-fill {
+  background: var(--alert);
+}
+
+.btn--ghost {
+  background: transparent;
+}
+
+.btn--active {
+  background: var(--signal-soft);
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+.btn--sm {
+  min-height: 42px;
+  padding: 6px 12px;
+  font-size: 0.8125rem;
+}
+
+.btn--lg {
+  min-height: 88px;
+  font-size: 1.0625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.btn--wide {
+  width: 100%;
+}
+
+/* --- stage (RZ) ------------------------------------------------------ */
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stage-panel {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 12px 20px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.stage-panel.is-running {
+  border-color: var(--signal);
+}
+
+.stage-panel.is-running::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--signal);
+}
+
+.stage-clock {
+  display: block;
+  margin-top: 6px;
+  font-size: clamp(2.75rem, 17vw, 5rem);
+  font-weight: 700;
+  font-stretch: 105%;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
+  color: var(--ink);
+}
+
+.stage-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.metric {
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.metric + .metric {
+  border-left: 1px solid var(--line);
+}
+
+.metric-value {
+  display: block;
+  margin-top: 5px;
+  font-size: 1.375rem;
+  font-weight: 700;
+  font-stretch: 105%;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.metric-unit {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.stage-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* Splits read as a time card: ruled rows, fixed fields. */
+.splits {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.splits-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.6875rem;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.split-row {
+  display: grid;
+  grid-template-columns: 2.25rem 1fr auto;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 12px;
+  font-size: 0.9375rem;
+}
+
+.split-row + .split-row {
+  border-top: 1px solid var(--line);
+}
+
+.split-idx {
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+
+.split-dist {
+  color: var(--ink-dim);
+  font-weight: 550;
+}
+
+.split-time {
+  font-weight: 700;
+  font-stretch: 105%;
+  color: var(--ink);
+}
+
+/* --- settings -------------------------------------------------------- */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.panel + .panel,
+.panel + .btn,
+.settings > * + * {
+  margin-top: 12px;
+}
+
+.settings {
+  display: block;
+}
+
+.panel-head {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.6875rem;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.setting {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  min-height: 48px;
-  border-bottom: 1px solid var(--line);
+  gap: 14px;
+  min-height: 56px;
+  padding: 10px 14px;
 }
-.switch:last-child { border-bottom: 0; }
 
-.seg { display: flex; background: var(--bg-3); border-radius: 10px; padding: 3px; gap: 3px; }
+.setting + .setting {
+  border-top: 1px solid var(--line);
+}
+
+.setting-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.setting-name {
+  font-weight: 650;
+}
+
+.setting-hint {
+  margin-top: 2px;
+  font-size: 0.75rem;
+  font-weight: 450;
+  color: var(--ink-faint);
+}
+
+.setting-control {
+  flex: none;
+  width: 132px;
+}
+
+/* --- form controls --------------------------------------------------- */
+
+input[type='text'],
+input[type='number'],
+select {
+  width: 100%;
+  min-height: 46px;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem; /* <16px makes iOS zoom on focus */
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+input::placeholder {
+  color: var(--ink-faint);
+  font-weight: 450;
+}
+
+.seg {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
 .seg button {
   flex: 1;
   min-height: 38px;
-  border: 0;
-  border-radius: 8px;
   background: none;
-  color: var(--fg-dim);
+  border: 0;
+  border-radius: 1px;
+  color: var(--ink-dim);
   font: inherit;
-  font-weight: 700;
-  font-size: 13px;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
   cursor: pointer;
-}
-.seg button[aria-pressed='true'] { background: var(--accent); color: #fff; }
-
-/* --- seznam rozpisu ------------------------------------------------ */
-
-.note-list { display: flex; flex-direction: column-reverse; gap: 6px; }
-
-.note {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--bg-2);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 8px 10px;
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease);
 }
 
-.note .idx { width: 24px; color: var(--fg-faint); font-size: 12px; font-weight: 700; flex: none; }
-.note .gap { font-size: 22px; font-weight: 800; min-width: 74px; text-align: right; flex: none; }
-.note .sym { font-size: 17px; font-weight: 800; color: var(--accent); min-width: 48px; }
-.note .txt { flex: 1; min-width: 0; color: var(--fg-dim); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-.sym-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; }
-.sym-grid.wide { grid-template-columns: repeat(3, 1fr); }
-.sym-grid button {
-  min-height: 44px;
-  border: 1px solid var(--line);
-  background: var(--bg-3);
-  border-radius: 9px;
-  color: var(--fg);
-  font: inherit;
-  font-weight: 700;
-  font-size: 13px;
-  cursor: pointer;
-  padding: 4px 2px;
+/* Aktivni volba: jemny tint, signalni text a linka pod volbou - stejny
+   slovnik jako u primarniho tlacitka, zadny blok syte barvy. */
+.seg button[aria-pressed='true'] {
+  background: var(--signal-soft);
+  color: var(--signal);
+  box-shadow: inset 0 -2px 0 var(--signal);
 }
-.sym-grid button[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-/* --- modal --------------------------------------------------------- */
+/* --- sheet ----------------------------------------------------------- */
 
-.sheet-bg {
+.sheet-scrim {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  z-index: var(--z-backdrop);
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  z-index: 50;
+  background: oklch(0.08 0.01 250 / 0.72);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .sheet {
+  z-index: var(--z-sheet);
   width: 100%;
   max-width: 560px;
-  background: var(--bg-2);
-  border: 1px solid var(--line);
-  border-radius: 18px 18px 0 0;
-  padding: 16px 14px calc(16px + env(safe-area-inset-bottom, 0px));
   max-height: 88vh;
   overflow-y: auto;
-  animation: up 0.16s ease-out;
+  padding: 18px 14px calc(18px + env(safe-area-inset-bottom, 0px));
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+  animation: sheet-in var(--mid) var(--ease);
 }
 
-@keyframes up { from { transform: translateY(16px); opacity: 0; } }
-
-.sheet h2 { margin: 0 0 12px; font-size: 17px; }
-
-/* --- varovani rychlosti -------------------------------------------- */
-
-.speed-alert {
-  border-color: var(--bad);
-  background: rgba(255, 59, 48, 0.12);
-  animation: blink 0.9s ease-in-out infinite;
+@keyframes sheet-in {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
 }
-@keyframes blink { 50% { background: rgba(255, 59, 48, 0.28); } }
 
-/* --- banner -------------------------------------------------------- */
+.sheet h2 {
+  margin: 0 0 4px;
+  font-size: 0.6875rem;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
 
-.banner {
-  background: var(--accent-soft);
-  border: 1px solid var(--accent);
-  color: var(--fg);
-  border-radius: 10px;
+.sheet-hint {
+  margin: 0 0 14px;
+  font-size: 0.8125rem;
+  font-weight: 450;
+  color: var(--ink-faint);
+}
+
+/* --- notices --------------------------------------------------------- */
+
+.notice {
+  flex: none;
   padding: 10px 12px;
-  font-size: 13px;
-  margin-bottom: 10px;
+  background: var(--caution-soft);
+  border: 1px solid var(--caution);
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+  font-weight: 550;
+  color: var(--ink);
 }
-.banner.bad { background: rgba(255, 59, 48, 0.14); border-color: var(--bad); }
 
-hr.sep { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
+.notice--alert {
+  background: var(--alert-soft);
+  border-color: var(--alert);
+}
+
+.notice--alert strong {
+  color: var(--alert);
+}
+
+/* --- utilities ------------------------------------------------------- */
+
+.cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.empty {
+  padding: 18px 14px;
+  font-size: 0.8125rem;
+  font-weight: 450;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+/* --- landscape: structural, not just smaller ------------------------- */
+
+@media (orientation: landscape) and (max-height: 560px) {
+  .main {
+    padding: 8px 10px;
+  }
+
+  .trip {
+    gap: 8px;
+  }
+
+  .trip-frame {
+    flex-direction: row;
+  }
+
+  .trip-frame .field + .field {
+    border-top: 0;
+    border-left: 1px solid var(--line);
+  }
+
+  .field {
+    padding: 10px;
+  }
+
+  .field-note {
+    margin-top: 7px;
+    font-size: 0.6875rem;
+  }
+
+  .readout-value {
+    font-size: 1.375rem;
+  }
+
+  .btn {
+    min-height: 46px;
+    font-size: 0.875rem;
+  }
+
+  .btn--lg {
+    min-height: 56px;
+    font-size: 0.9375rem;
+  }
+
+  .stage-clock {
+    font-size: clamp(2.25rem, 15vh, 4rem);
+  }
+}
+
+/* --- reduced motion: nothing moves, nothing is lost ------------------ */
 
 @media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .trip-frame.is-paused::before {
+    animation: none;
+  }
+
+  .strip-lamp[data-state='pulse'] {
+    animation: none;
+    opacity: 0.75;
+  }
 }

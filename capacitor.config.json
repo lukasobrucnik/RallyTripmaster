@@ -3,16 +3,16 @@
   "appName": "RallyTrip",
   "webDir": "dist",
   "android": {
-    "backgroundColor": "#0b0d10"
+    "backgroundColor": "#0a0c0f"
   },
   "ios": {
-    "backgroundColor": "#0b0d10",
+    "backgroundColor": "#0a0c0f",
     "contentInset": "always"
   },
   "plugins": {
     "SplashScreen": {
       "launchAutoHide": true,
-      "backgroundColor": "#0b0d10"
+      "backgroundColor": "#0a0c0f"
     }
   }
 }

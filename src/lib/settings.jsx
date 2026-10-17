@@ -13,7 +13,6 @@ export const DEFAULT_SETTINGS = {
   bigButtons: true,         // velke ovladaci plochy pro jizdu
   speedLimit: 0,            // km/h, 0 = vypnuto (rezim seznamovacich jizd)
   stepShort: 10,            // m - krok rucni korekce
-  voice: false,             // hlasove odpocty v rozpisu
 };
 
 const Ctx = createContext(null);
@@ -26,8 +25,12 @@ export function SettingsProvider({ children }) {
   useEffect(() => {
     document.documentElement.dataset.theme = settings.theme;
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', settings.theme === 'light' ? '#f2f3f5' : '#0b0d10');
+    if (meta) meta.setAttribute('content', settings.theme === 'light' ? '#f7f7f8' : '#0a0c0f');
   }, [settings.theme]);
+
+  useEffect(() => {
+    document.documentElement.dataset.big = settings.bigButtons ? 'true' : 'false';
+  }, [settings.bigButtons]);
 
   const value = useMemo(() => ({
     settings,
