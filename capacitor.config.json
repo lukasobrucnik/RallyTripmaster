@@ -1,0 +1,18 @@
+{
+  "appId": "cz.obrucnik.rallytrip",
+  "appName": "RallyTrip",
+  "webDir": "dist",
+  "android": {
+    "backgroundColor": "#0b0d10"
+  },
+  "ios": {
+    "backgroundColor": "#0b0d10",
+    "contentInset": "always"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "backgroundColor": "#0b0d10"
+    }
+  }
+}

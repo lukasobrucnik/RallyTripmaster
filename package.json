@@ -1,0 +1,32 @@
+{
+  "name": "rally-tripmaster",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Tripmaster pro rally - meric vzdalenosti, rozpis, RZ stopky a TSD rezim",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "cap:add:android": "cap add android",
+    "cap:add:ios": "cap add ios",
+    "cap:sync": "npm run build && cap sync",
+    "android": "npm run cap:sync && cap open android",
+    "ios": "npm run cap:sync && cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/geolocation": "^6.1.1",
+    "@capacitor/splash-screen": "^6.0.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/cli": "^6.2.0",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/ios": "^6.2.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.7",
+    "vite-plugin-mkcert": "^2.1.0"
+  }
+}
